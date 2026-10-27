@@ -1,8 +1,22 @@
+import { useState, useCallback, useMemo } from "react";
 import useFetchPhotos from "../hooks/useFetchPhotos";
 import PhotoCard from "./PhotoCard";
 
 export default function Gallery() {
     const { photos, loading, error } = useFetchPhotos()
+    const [searchTerm, setSearchTerm] = useState('')
+
+    const handleSearchChange = useCallback((e) => {
+        setSearchTerm(e.target.value)
+    }, [])
+
+    const filteredPhotos = useMemo(() => {
+        const term = searchTerm.trim().toLowerCase()
+        if (!term) return photos
+        return photos.filter((photo) =>
+            photo.author.toLowerCase().includes(term)
+        )
+    }, [photos, searchTerm])
 
     if (loading) {
         return (
@@ -21,15 +35,24 @@ export default function Gallery() {
     }
 
     return (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {photos.map((photo) => (
-                <PhotoCard
-                    key={photo.id}
-                    photo={photo}
-                    isFavourite={false}
-                    onToggleFavourite={() => { }}
-                />
-            ))}
+        <div>
+            <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                placeholder="Search by author..."
+                className="mb-6 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 outline-none focus:border-blue-500"
+            />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {filteredPhotos.map((photo) => (
+                    <PhotoCard
+                        key={photo.id}
+                        photo={photo}
+                        isFavourite={false}
+                        onToggleFavourite={() => { }}
+                    />
+                ))}
+            </div>
         </div>
     )
 }
