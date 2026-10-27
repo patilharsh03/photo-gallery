@@ -1,14 +1,12 @@
-import useFetchPhotos from "./hooks/useFetchPhotos"
+import Gallery from './components/Gallery'
 
-function App() {
-  const { photos, loading, error } = useFetchPhotos()
-  console.log({ photos, loading, error })
-
+export default function App() {
   return (
-    <>
-      <h1 className="text-3xl font-bold text-blue-600">Gallery</h1>
-    </>
+    <div className="min-h-screen bg-gray-100">
+      <div className="mx-auto max-w-7xl p-6">
+        <h1 className="mb-6 text-3xl font-bold text-gray-900">Photo Gallery</h1>
+        <Gallery />
+      </div>
+    </div>
   )
 }
-
-export default App
