@@ -1,10 +1,24 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useReducer, useEffect } from "react";
 import useFetchPhotos from "../hooks/useFetchPhotos";
 import PhotoCard from "./PhotoCard";
+import {
+    favouritesReducer,
+    loadFavourites,
+    STORAGE_KEY,
+} from "../reducers/favouritesReducer"
 
 export default function Gallery() {
     const { photos, loading, error } = useFetchPhotos()
     const [searchTerm, setSearchTerm] = useState('')
+    const [favourites, dispatch] = useReducer(
+        favouritesReducer,
+        [],
+        loadFavourites
+    )
+
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(favourites))
+    }, [favourites])
 
     const handleSearchChange = useCallback((e) => {
         setSearchTerm(e.target.value)
@@ -17,6 +31,10 @@ export default function Gallery() {
             photo.author.toLowerCase().includes(term)
         )
     }, [photos, searchTerm])
+
+    const handleToggleFavourite = (id) => {
+        dispatch({ type: 'TOGGLE_FAVOURITE', payload: id })
+    }
 
     if (loading) {
         return (
@@ -48,8 +66,8 @@ export default function Gallery() {
                     <PhotoCard
                         key={photo.id}
                         photo={photo}
-                        isFavourite={false}
-                        onToggleFavourite={() => { }}
+                        isFavourite={favourites.includes(photo.id)}
+                        onToggleFavourite={handleToggleFavourite}
                     />
                 ))}
             </div>
